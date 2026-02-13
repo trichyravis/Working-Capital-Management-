@@ -200,13 +200,18 @@ def main():
     dpo = (payables / cogs) * 365 if cogs else 0
     ccc = dso + dio - dpo
 
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
         "📊 Balance Sheet",
         "📈 Liquidity Metrics",
         "🔄 Cash Conversion Cycle",
         "📈 3-Year Forecast",
-        "🏦 Covenant & Stress Test"
+        "🏦 Covenant & Stress Test",
+        "📊 Multi-Year Trend",
+        "🏦 DSCR & EBITDA Covenants",
+        "💼 Credit Memo",
+        "📈 WC Sensitivity Grid"
     ])
+
 
 
     # BALANCE SHEET
@@ -363,6 +368,149 @@ def main():
         else:
             st.success("CCC Within Acceptable Bank Limits.")
 
+    # ==========================================================
+    # MULTI-YEAR TREND VIEW
+    # ==========================================================
+    with tab6:
+
+        st.markdown("### 📊 Historical + Forecast Trend")
+
+        history_years = 3
+        growth = 0.08
+
+        trend_data = []
+
+        rev_hist = revenue
+
+        # Simulated historical backward
+        for i in range(history_years, 0, -1):
+            rev_hist = rev_hist / (1 + growth)
+            trend_data.append({
+                "Year": f"Hist -{i}",
+                "Revenue": round(rev_hist),
+                "Working Capital": round((dso/365)*rev_hist + (dio/365)*cogs - (dpo/365)*cogs)
+            })
+
+        # Current
+        trend_data.append({
+            "Year": "Current",
+            "Revenue": revenue,
+            "Working Capital": net_wc
+        })
+
+        # Forecast forward
+        rev_fwd = revenue
+        for i in range(1, 4):
+            rev_fwd *= (1 + growth)
+            trend_data.append({
+                "Year": f"Fwd +{i}",
+                "Revenue": round(rev_fwd),
+                "Working Capital": round((dso/365)*rev_fwd + (dio/365)*cogs - (dpo/365)*cogs)
+            })
+
+        trend_df = pd.DataFrame(trend_data).set_index("Year")
+
+        st.line_chart(trend_df)
+
+        # ==========================================================
+    # DSCR & EBITDA COVENANT TEST
+    # ==========================================================
+    with tab7:
+
+        st.markdown("### 🏦 Debt Service Coverage & EBITDA Covenants")
+
+        debt_outstanding = st.number_input("Total Debt", value=5000000)
+        interest_rate = st.number_input("Interest Rate (%)", value=10) / 100
+        principal_payment = st.number_input("Annual Principal Payment", value=1000000)
+        ebitda_margin = st.number_input("EBITDA Margin (%)", value=25) / 100
+
+        ebitda = revenue * ebitda_margin
+        interest = debt_outstanding * interest_rate
+        debt_service = interest + principal_payment
+
+        dscr = ebitda / debt_service if debt_service else 0
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            metric_card("EBITDA", f"{ebitda:,.0f}")
+
+        with col2:
+            metric_card("DSCR", f"{dscr:.2f}")
+
+        covenant_dscr_min = 1.25
+        covenant_ebitda_min = 3000000
+
+        if dscr < covenant_dscr_min:
+            st.error("⚠️ DSCR Covenant Breach")
+        else:
+            st.success("DSCR Covenant Maintained")
+
+        if ebitda < covenant_ebitda_min:
+            st.error("⚠️ EBITDA Covenant Breach")
+        else:
+            st.success("EBITDA Covenant Maintained")
+
+        # ==========================================================
+    # CREDIT MEMO GENERATOR
+    # ==========================================================
+    with tab8:
+
+        st.markdown("### 💼 Automated Credit Memo Summary")
+
+        memo = f"""
+Company Revenue: ₹ {revenue:,.0f}
+
+Net Working Capital: ₹ {net_wc:,.0f}
+Current Ratio: {current_ratio:.2f}
+Cash Conversion Cycle: {ccc:.1f} days
+
+EBITDA: ₹ {ebitda:,.0f}
+DSCR: {dscr:.2f}
+
+Assessment:
+"""
+
+        if current_ratio < 1.25:
+            memo += "\n- Liquidity risk elevated."
+        else:
+            memo += "\n- Liquidity position acceptable."
+
+        if dscr < 1.25:
+            memo += "\n- Debt servicing risk observed."
+        else:
+            memo += "\n- Debt servicing adequate."
+
+        if ccc > 60:
+            memo += "\n- Working capital cycle extended."
+        else:
+            memo += "\n- Working capital cycle efficient."
+
+        st.text_area("Credit Committee Note", memo, height=300)
+
+        # ==========================================================
+    # REVENUE-LINKED WC SENSITIVITY GRID
+    # ==========================================================
+    with tab9:
+
+        st.markdown("### 📈 Revenue vs Working Capital Sensitivity")
+
+        growth_range = [0, 5, 10, 15, 20]
+        sensitivity = []
+
+        for g in growth_range:
+            rev_s = revenue * (1 + g/100)
+            wc_s = (dso/365)*rev_s + (dio/365)*cogs - (dpo/365)*cogs
+
+            sensitivity.append({
+                "Revenue Growth %": g,
+                "Projected Revenue": round(rev_s),
+                "Working Capital Required": round(wc_s)
+            })
+
+        sens_df = pd.DataFrame(sensitivity)
+
+        st.dataframe(sens_df, use_container_width=True, hide_index=True)
 
 
     
