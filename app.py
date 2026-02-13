@@ -218,6 +218,7 @@ def main():
             metric_card("Quick Ratio", f"{quick_ratio:.2f}")
 
     # -------- CCC --------
+        # -------- CCC --------
     with tab3:
         col1, col2, col3, col4 = st.columns(4)
 
@@ -235,6 +236,7 @@ def main():
 
         st.markdown("<br>", unsafe_allow_html=True)
 
+        # ===== CCC INTERPRETATION (unchanged logic) =====
         if ccc < 0:
             st.success("Negative CCC — strong working capital efficiency.")
         elif ccc < 60:
@@ -242,12 +244,51 @@ def main():
         else:
             st.warning("High CCC — working capital tied up for long duration.")
 
-    st.divider()
-    st.markdown(f"""
-    <div style="text-align:center; color:{COLORS['accent_gold']}; font-weight:bold;">
-        {BRANDING['icon']} {BRANDING['name']}
-    </div>
-    """, unsafe_allow_html=True)
+        # ==========================================================
+        # NEW: CCC WATERFALL (non-intrusive)
+        # ==========================================================
+        st.markdown("### 📊 CCC Decomposition")
+
+        waterfall = pd.DataFrame({
+            "Component": ["DSO", "DIO", "-DPO"],
+            "Days": [dso, dio, -dpo]
+        }).set_index("Component")
+
+        st.bar_chart(waterfall)
+
+        # ==========================================================
+        # NEW: Working Capital Release Simulation
+        # ==========================================================
+        st.markdown("### 💰 Working Capital Release Simulation")
+
+        reduce_days = st.slider("Reduce CCC by (Days)", 0, 60, 10)
+
+        cash_release = (reduce_days / 365) * revenue
+
+        st.success(f"Estimated Cash Release: ₹ {cash_release:,.0f}")
+
+        # ==========================================================
+        # NEW: AI Recommendation Engine (Light-touch addition)
+        # ==========================================================
+        st.markdown("### 🤖 AI Working Capital Suggestions")
+
+        suggestions = []
+
+        if dso > 90:
+            suggestions.append("Tighten credit control policies.")
+        if dio > 90:
+            suggestions.append("Optimize inventory procurement cycle.")
+        if dpo < 45:
+            suggestions.append("Negotiate extended supplier terms.")
+        if ccc > 60:
+            suggestions.append("Launch structured working capital optimization program.")
+
+        if suggestions:
+            for s in suggestions:
+                st.warning(s)
+        else:
+            st.success("Working capital structure appears efficient.")
+
 
 
 if __name__ == "__main__":
