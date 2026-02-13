@@ -286,6 +286,83 @@ def main():
         else:
             st.success("Working capital structure appears efficient.")
 
+    # ==========================================================
+    # 3-YEAR WORKING CAPITAL FORECAST
+    # ==========================================================
+    with tab4:
+
+        st.markdown("### 📈 3-Year Working Capital Forecast")
+
+        growth_rate = st.slider("Annual Revenue Growth (%)", 0, 30, 10) / 100
+
+        forecast_data = []
+        rev = revenue
+
+        for year in range(1, 4):
+            rev = rev * (1 + growth_rate)
+
+            rec = (dso / 365) * rev
+            inv = (dio / 365) * cogs * (1 + growth_rate) ** year
+            pay = (dpo / 365) * cogs * (1 + growth_rate) ** year
+
+            wc = rec + inv - pay
+
+            forecast_data.append({
+                "Year": f"Year {year}",
+                "Revenue": round(rev),
+                "Working Capital Required": round(wc),
+                "Projected CCC": round(dso + dio - dpo, 1)
+            })
+
+        forecast_df = pd.DataFrame(forecast_data)
+
+        st.dataframe(forecast_df, use_container_width=True, hide_index=True)
+
+        incremental_wc = forecast_df["Working Capital Required"].iloc[-1] - net_wc
+
+        st.info(f"Additional Working Capital Needed in 3 Years: ₹ {incremental_wc:,.0f}")
+    # ==========================================================
+    # BANK COVENANT & STRESS TEST
+    # ==========================================================
+    with tab5:
+
+        st.markdown("### 🏦 Bank Covenant & Liquidity Stress Panel")
+
+        min_current_ratio = st.number_input("Minimum Required Current Ratio (Bank)", value=1.25)
+        max_ccc_allowed = st.number_input("Maximum CCC Allowed (Days)", value=90)
+
+        stress_revenue_drop = st.slider("Revenue Stress Scenario (%)", 0, 50, 20) / 100
+
+        stressed_revenue = revenue * (1 - stress_revenue_drop)
+
+        stressed_receivables = (dso / 365) * stressed_revenue
+        stressed_wc = stressed_receivables + inventory - payables
+
+        stressed_current_ratio = (cash + stressed_receivables + inventory + other_ca) / total_cl if total_cl else 0
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            metric_card("Stressed Current Ratio", f"{stressed_current_ratio:.2f}")
+
+        with col2:
+            metric_card("Stressed Working Capital", f"{stressed_wc:,.0f}")
+
+        st.markdown("### Covenant Status")
+
+        if stressed_current_ratio < min_current_ratio:
+            st.error("⚠️ Current Ratio Covenant Breach Under Stress Scenario.")
+        else:
+            st.success("Current Ratio Covenant Maintained.")
+
+        if ccc > max_ccc_allowed:
+            st.error("⚠️ CCC Covenant Breach.")
+        else:
+            st.success("CCC Within Acceptable Bank Limits.")
+
+
+
+    
     st.divider()
     st.markdown(f"""
     <div style="text-align:center; color:{COLORS['accent_gold']}; font-weight:bold;">
