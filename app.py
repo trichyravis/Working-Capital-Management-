@@ -1,19 +1,15 @@
 
-
 """
 Working Capital AI Agent - Mountain Path Edition
-With Solid Metric Cards (No st.metric transparency issues)
-
-The Mountain Path - World of Finance
-Prof. V. Ravichandran
+Enhanced Version (Contrast Fixed + CCC Enhancements)
 """
 
 import streamlit as st
 import pandas as pd
 
-# ============================================================================
+# ==========================================================
 # BRANDING
-# ============================================================================
+# ==========================================================
 
 COLORS = {
     'dark_blue': '#003366',
@@ -39,9 +35,9 @@ PAGE_CONFIG = {
     'initial_sidebar_state': 'expanded',
 }
 
-# ============================================================================
+# ==========================================================
 # STYLING
-# ============================================================================
+# ==========================================================
 
 def apply_styles():
     st.markdown(f"""
@@ -64,6 +60,31 @@ def apply_styles():
         color: black !important;
     }}
 
+    /* ===== MAIN CONTENT CONTRAST FIX ===== */
+
+    .main * {{
+        color: {COLORS['text_primary']} !important;
+    }}
+
+    h1, h2, h3, h4, h5, h6 {{
+        color: {COLORS['accent_gold']} !important;
+    }}
+
+    div[data-testid="stMarkdownContainer"] p {{
+        color: {COLORS['text_primary']} !important;
+    }}
+
+    div[data-testid="stSlider"] label {{
+        color: {COLORS['text_primary']} !important;
+    }}
+
+    div[data-testid="stAlert"] * {{
+        color: white !important;
+        font-weight: 500;
+    }}
+
+    /* Header */
+
     .header-container {{
         background: linear-gradient(135deg, {COLORS['dark_blue']}, {COLORS['medium_blue']});
         border: 2px solid {COLORS['accent_gold']};
@@ -81,6 +102,8 @@ def apply_styles():
     .header-container p {{
         color: {COLORS['text_primary']} !important;
     }}
+
+    /* Tabs */
 
     .stTabs [data-baseweb="tab"] {{
         background: {COLORS['card_bg']};
@@ -102,9 +125,9 @@ def apply_styles():
     </style>
     """, unsafe_allow_html=True)
 
-# ============================================================================
-# METRIC CARD FUNCTION
-# ============================================================================
+# ==========================================================
+# METRIC CARD
+# ==========================================================
 
 def metric_card(label, value):
     st.markdown(f"""
@@ -132,47 +155,14 @@ def metric_card(label, value):
     </div>
     """, unsafe_allow_html=True)
 
-/* ===== FORCE MAIN CONTENT TEXT TO BE HIGH CONTRAST ===== */
-
-.main * {
-    color: #e6f1ff !important;
-}
-
-/* Headings */
-h1, h2, h3, h4, h5, h6 {
-    color: #FFD700 !important;
-}
-
-/* Markdown text */
-div[data-testid="stMarkdownContainer"] p {
-    color: #e6f1ff !important;
-}
-
-/* Slider label text */
-div[data-testid="stSlider"] label {
-    color: #e6f1ff !important;
-}
-
-/* Alert text */
-div[data-testid="stAlert"] * {
-    color: white !important;
-}
-
-/* Success box background text clarity */
-div[data-testid="stAlert"] {
-    font-weight: 500;
-}
-
-
-# ============================================================================
-# MAIN APPLICATION
-# ============================================================================
+# ==========================================================
+# MAIN
+# ==========================================================
 
 def main():
     st.set_page_config(**PAGE_CONFIG)
     apply_styles()
 
-    # HEADER
     st.markdown(f"""
     <div class="header-container">
         <h1>{BRANDING['icon']} Working Capital AI Agent</h1>
@@ -181,8 +171,7 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-    # ================= SIDEBAR =================
-
+    # SIDEBAR INPUTS
     st.sidebar.markdown("### 🧾 Income Statement Inputs")
     revenue = st.sidebar.number_input("Annual Revenue", 20000000)
     cogs = st.sidebar.number_input("Annual COGS", 14000000)
@@ -198,8 +187,7 @@ def main():
     short_debt = st.sidebar.number_input("Short-Term Debt", 1500000)
     other_cl = st.sidebar.number_input("Other Current Liabilities", 400000)
 
-    # ================= CALCULATIONS =================
-
+    # CALCULATIONS
     total_ca = cash + receivables + inventory + other_ca
     total_cl = payables + short_debt + other_cl
 
@@ -212,15 +200,13 @@ def main():
     dpo = (payables / cogs) * 365 if cogs else 0
     ccc = dso + dio - dpo
 
-    # ================= TABS =================
-
     tab1, tab2, tab3 = st.tabs([
         "📊 Balance Sheet",
         "📈 Liquidity Metrics",
         "🔄 Cash Conversion Cycle"
     ])
 
-    # -------- BALANCE SHEET --------
+    # BALANCE SHEET
     with tab1:
         col1, col2 = st.columns(2)
 
@@ -236,7 +222,7 @@ def main():
                 "Amount": [payables, short_debt, other_cl, total_cl]
             }), use_container_width=True, hide_index=True)
 
-    # -------- LIQUIDITY --------
+    # LIQUIDITY
     with tab2:
         col1, col2, col3 = st.columns(3)
 
@@ -249,8 +235,7 @@ def main():
         with col3:
             metric_card("Quick Ratio", f"{quick_ratio:.2f}")
 
-    # -------- CCC --------
-        # -------- CCC --------
+    # CCC
     with tab3:
         col1, col2, col3, col4 = st.columns(4)
 
@@ -266,55 +251,22 @@ def main():
         with col4:
             metric_card("CCC (Days)", f"{ccc:.1f}")
 
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        # ===== CCC INTERPRETATION (unchanged logic) =====
-        if ccc < 0:
-            st.success("Negative CCC — strong working capital efficiency.")
-        elif ccc < 60:
-            st.info("Moderate CCC — manageable cycle.")
-        else:
-            st.warning("High CCC — working capital tied up for long duration.")
-
-        # ==========================================================
-        # NEW: CCC WATERFALL (non-intrusive)
-        # ==========================================================
         st.markdown("### 📊 CCC Decomposition")
-        
-        # Create waterfall dataframe
+
         waterfall = pd.DataFrame({
             "Component": ["DSO", "DIO", "-DPO"],
             "Days": [dso, dio, -dpo]
         }).set_index("Component")
-        
-        # Wrap chart in light container for visibility
-        st.markdown("""
-        <div style="
-            background:white;
-            padding:20px;
-            border-radius:12px;
-        ">
-        """, unsafe_allow_html=True)
-        
+
         st.bar_chart(waterfall)
-        
-        st.markdown("</div>", unsafe_allow_html=True)
 
-
-        # ==========================================================
-        # NEW: Working Capital Release Simulation
-        # ==========================================================
         st.markdown("### 💰 Working Capital Release Simulation")
 
         reduce_days = st.slider("Reduce CCC by (Days)", 0, 60, 10)
-
         cash_release = (reduce_days / 365) * revenue
 
         st.success(f"Estimated Cash Release: ₹ {cash_release:,.0f}")
 
-        # ==========================================================
-        # NEW: AI Recommendation Engine (Light-touch addition)
-        # ==========================================================
         st.markdown("### 🤖 AI Working Capital Suggestions")
 
         suggestions = []
@@ -334,7 +286,12 @@ def main():
         else:
             st.success("Working capital structure appears efficient.")
 
-
+    st.divider()
+    st.markdown(f"""
+    <div style="text-align:center; color:{COLORS['accent_gold']}; font-weight:bold;">
+        {BRANDING['icon']} {BRANDING['name']}
+    </div>
+    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
