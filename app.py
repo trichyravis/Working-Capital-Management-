@@ -122,6 +122,19 @@ def apply_styles():
 
     footer {{visibility: hidden;}}
 
+    /* ===== FIX TAB OVERFLOW — ENABLE WRAPPING ===== */
+
+.stTabs [data-baseweb="tab-list"] {
+    flex-wrap: wrap !important;
+    row-gap: 8px;
+}
+
+/* Prevent tabs from stretching too wide */
+.stTabs [data-baseweb="tab"] {
+    flex: 0 0 auto;
+}
+
+
     </style>
     """, unsafe_allow_html=True)
 
