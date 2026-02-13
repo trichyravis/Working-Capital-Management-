@@ -45,17 +45,18 @@ PAGE_CONFIG = {
 def apply_styles():
     st.markdown(f"""
     <style>
+
+        /* GLOBAL BACKGROUND */
         .stApp {{
             background: linear-gradient(135deg, {COLORS['bg_dark']} 0%, {COLORS['dark_blue']} 50%, #0d2137 100%);
         }}
 
-        /* Sidebar */
+        /* SIDEBAR */
         section[data-testid="stSidebar"] {{
             background: linear-gradient(180deg, {COLORS['bg_dark']} 0%, {COLORS['dark_blue']} 100%);
         }}
 
-        section[data-testid="stSidebar"] label,
-        section[data-testid="stSidebar"] p {{
+        section[data-testid="stSidebar"] * {{
             color: {COLORS['text_primary']} !important;
         }}
 
@@ -64,7 +65,7 @@ def apply_styles():
             color: black !important;
         }}
 
-        /* Header */
+        /* HEADER */
         .header-container {{
             background: linear-gradient(135deg, {COLORS['dark_blue']}, {COLORS['medium_blue']});
             border: 2px solid {COLORS['accent_gold']};
@@ -99,7 +100,7 @@ def apply_styles():
             color: {COLORS['accent_gold']} !important;
         }}
 
-        /* ===== FIX METRIC VISIBILITY ===== */
+        /* ====== METRIC FIX (DEEP OVERRIDE) ====== */
 
         div[data-testid="metric-container"] {{
             background: {COLORS['card_bg']};
@@ -108,24 +109,29 @@ def apply_styles():
             padding: 1rem;
         }}
 
-        div[data-testid="metric-container"] label {{
-            color: {COLORS['text_secondary']} !important;
-            font-size: 0.8rem;
+        div[data-testid="metric-container"] * {{
+            color: {COLORS['accent_gold']} !important;
         }}
 
-        div[data-testid="metric-container"] div {{
+        div[data-testid="metric-container"] label {{
+            color: {COLORS['text_secondary']} !important;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }}
+
+        div[data-testid="metric-container"] span {{
             color: {COLORS['accent_gold']} !important;
-            font-size: 1.6rem;
-            font-weight: 700;
+            font-size: 1.8rem !important;
+            font-weight: 700 !important;
         }}
 
         /* FIX ALERT TEXT */
-        div[data-testid="stAlert"] {{
+        div[data-testid="stAlert"] * {{
             color: {COLORS['text_primary']} !important;
             font-weight: 500;
         }}
 
-        /* Section titles */
+        /* SECTION TITLES */
         .section-title {{
             color: {COLORS['accent_gold']};
             font-size: 1.3rem;
@@ -133,8 +139,10 @@ def apply_styles():
         }}
 
         footer {{visibility: hidden;}}
+
     </style>
     """, unsafe_allow_html=True)
+
 
 
 # ============================================================================
