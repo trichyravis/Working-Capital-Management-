@@ -90,43 +90,27 @@ def apply_styles():
 
         /* Header */
         .header-container {{
-            background: linear-gradient(135deg, {COLORS['dark_blue']}, {COLORS['medium_blue']});
-            border: 2px solid {COLORS['accent_gold']};
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }}
+    background: linear-gradient(135deg, {COLORS['dark_blue']}, {COLORS['medium_blue']});
+    border: 2px solid {COLORS['accent_gold']};
+    border-radius: 12px;
+    padding: 1.8rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}}
 
-        .metric-card {{
-            background: {COLORS['card_bg']};
-            border: 1px solid rgba(255,215,0,0.3);
-            border-radius: 10px;
-            padding: 1rem;
-            text-align: center;
-        }}
+.header-container h1 {{
+    color: {COLORS['accent_gold']} !important;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}}
 
-        .metric-card .label {{
-            color: {COLORS['text_secondary']};
-            font-size: 0.8rem;
-        }}
+.header-container p {{
+    color: {COLORS['text_primary']} !important;
+    font-size: 0.95rem;
+    opacity: 0.9;
+}}
 
-        .metric-card .value {{
-            color: {COLORS['accent_gold']};
-            font-size: 1.5rem;
-            font-weight: bold;
-        }}
-
-        .section-title {{
-            color: {COLORS['accent_gold']};
-            font-size: 1.2rem;
-            border-bottom: 2px solid rgba(255,215,0,0.3);
-            margin: 1.5rem 0 1rem;
-        }}
-
-        footer {{visibility: hidden;}}
-    </style>
-    """, unsafe_allow_html=True)
 
 
 
