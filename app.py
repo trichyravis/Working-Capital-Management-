@@ -46,102 +46,99 @@ def apply_styles():
     st.markdown(f"""
     <style>
 
-        /* GLOBAL BACKGROUND */
-        .stApp {{
-            background: linear-gradient(135deg, {COLORS['bg_dark']} 0%, {COLORS['dark_blue']} 50%, #0d2137 100%);
-        }}
+    /* Background */
+    .stApp {{
+        background: linear-gradient(135deg, {COLORS['bg_dark']} 0%, {COLORS['dark_blue']} 50%, #0d2137 100%);
+    }}
 
-        /* SIDEBAR */
-        section[data-testid="stSidebar"] {{
-            background: linear-gradient(180deg, {COLORS['bg_dark']} 0%, {COLORS['dark_blue']} 100%);
-        }}
+    /* Sidebar */
+    section[data-testid="stSidebar"] {{
+        background: linear-gradient(180deg, {COLORS['bg_dark']} 0%, {COLORS['dark_blue']} 100%);
+    }}
 
-        section[data-testid="stSidebar"] * {{
-            color: {COLORS['text_primary']} !important;
-        }}
+    section[data-testid="stSidebar"] * {{
+        color: {COLORS['text_primary']} !important;
+    }}
 
-        section[data-testid="stSidebar"] input {{
-            background-color: white !important;
-            color: black !important;
-        }}
+    section[data-testid="stSidebar"] input {{
+        background-color: white !important;
+        color: black !important;
+    }}
 
-        /* HEADER */
-        .header-container {{
-            background: linear-gradient(135deg, {COLORS['dark_blue']}, {COLORS['medium_blue']});
-            border: 2px solid {COLORS['accent_gold']};
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            text-align: center;
-        }}
+    /* Header */
+    .header-container {{
+        background: linear-gradient(135deg, {COLORS['dark_blue']}, {COLORS['medium_blue']});
+        border: 2px solid {COLORS['accent_gold']};
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }}
 
-        .header-container h1 {{
-            color: {COLORS['accent_gold']} !important;
-            font-size: 2.2rem;
-        }}
+    .header-container h1 {{
+        color: {COLORS['accent_gold']} !important;
+        font-size: 2.2rem;
+    }}
 
-        .header-container p {{
-            color: {COLORS['text_primary']} !important;
-        }}
+    .header-container p {{
+        color: {COLORS['text_primary']} !important;
+    }}
 
-        /* TABS */
-        .stTabs [data-baseweb="tab"] {{
-            background: {COLORS['card_bg']};
-            border: 1px solid rgba(255,215,0,0.3);
-            border-radius: 8px;
-            color: {COLORS['text_primary']} !important;
-            font-weight: 600;
-            padding: 8px 16px;
-        }}
+    /* Tabs */
+    .stTabs [data-baseweb="tab"] {{
+        background: {COLORS['card_bg']};
+        border: 1px solid rgba(255,215,0,0.3);
+        border-radius: 8px;
+        color: {COLORS['text_primary']} !important;
+        font-weight: 600;
+        padding: 8px 16px;
+    }}
 
-        .stTabs [aria-selected="true"] {{
-            background: {COLORS['dark_blue']} !important;
-            border: 2px solid {COLORS['accent_gold']} !important;
-            color: {COLORS['accent_gold']} !important;
-        }}
+    .stTabs [aria-selected="true"] {{
+        background: {COLORS['dark_blue']} !important;
+        border: 2px solid {COLORS['accent_gold']} !important;
+        color: {COLORS['accent_gold']} !important;
+    }}
 
-        /* ====== METRIC FIX (DEEP OVERRIDE) ====== */
+    /* ===== HARD OVERRIDE FOR METRICS ===== */
 
-        div[data-testid="metric-container"] {{
-            background: {COLORS['card_bg']};
-            border: 1px solid rgba(255,215,0,0.3);
-            border-radius: 10px;
-            padding: 1rem;
-        }}
+    div[data-testid="metric-container"] {{
+        background: {COLORS['card_bg']} !important;
+        border: 1px solid rgba(255,215,0,0.3) !important;
+        border-radius: 10px !important;
+        padding: 1rem !important;
+    }}
 
-        div[data-testid="metric-container"] * {{
-            color: {COLORS['accent_gold']} !important;
-        }}
+    /* Metric label */
+    div[data-testid="metric-container"] label {{
+        color: {COLORS['text_secondary']} !important;
+        font-size: 0.85rem !important;
+        font-weight: 500 !important;
+    }}
 
-        div[data-testid="metric-container"] label {{
-            color: {COLORS['text_secondary']} !important;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }}
+    /* Metric value — exact selector */
+    div[data-testid="metric-container"] > div {{
+        color: {COLORS['accent_gold']} !important;
+        font-size: 1.8rem !important;
+        font-weight: 700 !important;
+    }}
 
-        div[data-testid="metric-container"] span {{
-            color: {COLORS['accent_gold']} !important;
-            font-size: 1.8rem !important;
-            font-weight: 700 !important;
-        }}
+    /* Also override nested text nodes */
+    div[data-testid="metric-container"] span {{
+        color: {COLORS['accent_gold']} !important;
+    }}
 
-        /* FIX ALERT TEXT */
-        div[data-testid="stAlert"] * {{
-            color: {COLORS['text_primary']} !important;
-            font-weight: 500;
-        }}
+    /* Alerts */
+    div[data-testid="stAlert"] * {{
+        color: {COLORS['text_primary']} !important;
+        font-weight: 500;
+    }}
 
-        /* SECTION TITLES */
-        .section-title {{
-            color: {COLORS['accent_gold']};
-            font-size: 1.3rem;
-            margin: 1.5rem 0 1rem;
-        }}
-
-        footer {{visibility: hidden;}}
+    footer {{visibility: hidden;}}
 
     </style>
     """, unsafe_allow_html=True)
+
 
 
 
