@@ -61,6 +61,34 @@ def apply_styles():
             border-right: 1px solid rgba(255,215,0,0.2);
         }}
 
+        /* FORCE ALL SIDEBAR TEXT TO BE LIGHT */
+        section[data-testid="stSidebar"] label,
+        section[data-testid="stSidebar"] .stMarkdown,
+        section[data-testid="stSidebar"] p,
+        section[data-testid="stSidebar"] span,
+        section[data-testid="stSidebar"] div,
+        section[data-testid="stSidebar"] [data-testid="stWidgetLabel"] p,
+        section[data-testid="stSidebar"] [data-testid="stWidgetLabel"] label {{
+            color: {COLORS['text_primary']} !important;
+        }}
+
+        /* Slider current value */
+        section[data-testid="stSidebar"] [data-testid="stThumbValue"] {{
+            color: {COLORS['accent_gold']} !important;
+            font-weight: bold;
+        }}
+
+        /* Input fields */
+        section[data-testid="stSidebar"] input {{
+            background-color: #ffffff !important;
+            color: #000000 !important;
+        }}
+
+        /* Selectbox text */
+        section[data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"] span {{
+            color: {COLORS['text_primary']} !important;
+        }}
+
         .header-container {{
             background: linear-gradient(135deg, {COLORS['dark_blue']}, {COLORS['medium_blue']});
             border: 2px solid {COLORS['accent_gold']};
@@ -99,7 +127,6 @@ def apply_styles():
             color: {COLORS['accent_gold']};
             font-size: 1.6rem;
             font-weight: 700;
-            margin-top: 0.3rem;
         }}
 
         .section-title {{
@@ -218,7 +245,7 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-    # ================= SIDEBAR =================
+    # SIDEBAR INPUTS
     st.sidebar.markdown("### 📊 Working Capital Assumptions")
 
     current_stock = st.sidebar.number_input("Current Inventory", 1200)
@@ -245,7 +272,6 @@ def main():
     forecast = agent.cash_forecast()
     reorder_point, stockout = agent.inventory_analysis()
 
-    # ================= TABS =================
     tab1, tab2, tab3, tab4 = st.tabs([
         "📋 WC Summary",
         "💰 Receivables Risk",
@@ -259,29 +285,14 @@ def main():
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            st.markdown(f"""
-            <div class="metric-card">
-                <div class="label">High Risk Customers</div>
-                <div class="value">{len(high_risk)}</div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-card"><div class="label">High Risk Customers</div><div class="value">{len(high_risk)}</div></div>', unsafe_allow_html=True)
 
         with col2:
-            st.markdown(f"""
-            <div class="metric-card">
-                <div class="label">Reorder Point</div>
-                <div class="value">{reorder_point}</div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-card"><div class="label">Reorder Point</div><div class="value">{reorder_point}</div></div>', unsafe_allow_html=True)
 
         with col3:
             status = "⚠️ STOCKOUT RISK" if stockout else "✅ HEALTHY"
-            st.markdown(f"""
-            <div class="metric-card">
-                <div class="label">Inventory Status</div>
-                <div class="value">{status}</div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-card"><div class="label">Inventory Status</div><div class="value">{status}</div></div>', unsafe_allow_html=True)
 
     with tab2:
         st.markdown('<div class="section-title">⚠️ High Risk Receivables</div>', unsafe_allow_html=True)
