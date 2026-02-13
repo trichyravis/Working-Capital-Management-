@@ -203,12 +203,14 @@ def main():
 
     # ================= TABS =================
 
-    tab1, tab2, tab3, tab4 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "📊 Balance Sheet",
         "📈 Liquidity Metrics",
         "🔄 Cash Conversion Cycle",
-        "📊 Advanced CFO View"
+        "📊 Advanced CFO View",
+        "📊 Visual Analytics"
     ])
+
 
     # -------- BALANCE SHEET --------
     with tab1:
@@ -298,6 +300,55 @@ def main():
             st.warning("⚠️ DSCR Covenant Risk")
         else:
             st.success("DSCR Covenant Comfortable")
+                # -------- VISUAL ANALYTICS --------
+    with tab5:
+
+        st.markdown("### 📈 CCC Decomposition")
+
+        ccc_df = pd.DataFrame({
+            "Component": ["DSO", "DIO", "-DPO"],
+            "Days": [dso, dio, -dpo]
+        })
+
+        st.bar_chart(ccc_df.set_index("Component"))
+
+        st.markdown("---")
+
+        st.markdown("### 💰 Working Capital Composition")
+
+        wc_comp = pd.DataFrame({
+            "Component": ["Receivables", "Inventory", "Payables"],
+            "Amount": [receivables, inventory, -payables]
+        })
+
+        st.bar_chart(wc_comp.set_index("Component"))
+
+        st.markdown("---")
+
+        st.markdown("### 📊 3-Year Working Capital Trend")
+
+        growth = 0.10  # Default 10% for visual projection
+        rev_temp = revenue
+
+        trend_data = []
+
+        for year in range(1, 4):
+            rev_temp *= (1 + growth)
+
+            rec = (dso / 365) * rev_temp
+            inv = (dio / 365) * cogs * (1 + growth) ** year
+            pay = (dpo / 365) * cogs * (1 + growth) ** year
+
+            wc = rec + inv - pay
+
+            trend_data.append({
+                "Year": f"Year {year}",
+                "Working Capital": wc
+            })
+
+        trend_df = pd.DataFrame(trend_data)
+        st.line_chart(trend_df.set_index("Year"))
+
 
     st.divider()
     st.markdown(f"""
