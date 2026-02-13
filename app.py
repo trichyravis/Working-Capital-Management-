@@ -1,24 +1,17 @@
 
 """
 Working Capital AI Agent - Mountain Path Edition
+Now Includes Cash Conversion Cycle (DSO, DIO, DPO, CCC)
+
 The Mountain Path - World of Finance
 Prof. V. Ravichandran
-
-Now Includes:
-- Current Assets
-- Current Liabilities
-- Net Working Capital
-- Liquidity Ratios
-- Premium Institutional UI
-
-ZERO external chart libraries - Streamlit native only
 """
 
 import streamlit as st
 import pandas as pd
 
 # ============================================================================
-# BRANDING & COLORS
+# BRANDING
 # ============================================================================
 
 COLORS = {
@@ -29,8 +22,6 @@ COLORS = {
     'card_bg': '#112240',
     'text_primary': '#e6f1ff',
     'text_secondary': '#8892b0',
-    'success': '#28a745',
-    'danger': '#dc3545',
 }
 
 BRANDING = {
@@ -47,7 +38,6 @@ PAGE_CONFIG = {
     'initial_sidebar_state': 'expanded',
 }
 
-
 # ============================================================================
 # STYLING
 # ============================================================================
@@ -59,14 +49,12 @@ def apply_styles():
             background: linear-gradient(135deg, {COLORS['bg_dark']} 0%, {COLORS['dark_blue']} 50%, #0d2137 100%);
         }}
 
-        /* SIDEBAR */
         section[data-testid="stSidebar"] {{
             background: linear-gradient(180deg, {COLORS['bg_dark']} 0%, {COLORS['dark_blue']} 100%);
         }}
 
         section[data-testid="stSidebar"] label,
-        section[data-testid="stSidebar"] p,
-        section[data-testid="stSidebar"] span {{
+        section[data-testid="stSidebar"] p {{
             color: {COLORS['text_primary']} !important;
         }}
 
@@ -75,7 +63,6 @@ def apply_styles():
             color: black !important;
         }}
 
-        /* HEADER */
         .header-container {{
             background: linear-gradient(135deg, {COLORS['dark_blue']}, {COLORS['medium_blue']});
             border: 2px solid {COLORS['accent_gold']};
@@ -83,39 +70,17 @@ def apply_styles():
             padding: 2rem;
             margin-bottom: 2rem;
             text-align: center;
-            box-shadow: 0px 4px 20px rgba(0,0,0,0.4);
         }}
 
         .header-container h1 {{
             color: {COLORS['accent_gold']} !important;
             font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
         }}
 
         .header-container p {{
             color: {COLORS['text_primary']} !important;
-            font-size: 0.95rem;
-            opacity: 0.9;
         }}
 
-        /* TABS */
-        .stTabs [data-baseweb="tab"] {{
-            background: {COLORS['card_bg']};
-            border: 1px solid rgba(255,215,0,0.3);
-            border-radius: 8px;
-            color: {COLORS['text_primary']} !important;
-            font-weight: 600;
-            padding: 8px 16px;
-        }}
-
-        .stTabs [aria-selected="true"] {{
-            background: {COLORS['dark_blue']} !important;
-            border: 2px solid {COLORS['accent_gold']} !important;
-            color: {COLORS['accent_gold']} !important;
-        }}
-
-        /* METRIC CARDS */
         .metric-card {{
             background: {COLORS['card_bg']};
             border: 1px solid rgba(255,215,0,0.3);
@@ -131,14 +96,13 @@ def apply_styles():
 
         .metric-card .value {{
             color: {COLORS['accent_gold']};
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: bold;
         }}
 
         .section-title {{
             color: {COLORS['accent_gold']};
             font-size: 1.3rem;
-            border-bottom: 2px solid rgba(255,215,0,0.3);
             margin: 1.5rem 0 1rem;
         }}
 
@@ -146,16 +110,14 @@ def apply_styles():
     </style>
     """, unsafe_allow_html=True)
 
-
 # ============================================================================
-# MAIN APPLICATION
+# MAIN
 # ============================================================================
 
 def main():
     st.set_page_config(**PAGE_CONFIG)
     apply_styles()
 
-    # HEADER
     st.markdown(f"""
     <div class="header-container">
         <h1>{BRANDING['icon']} Working Capital AI Agent</h1>
@@ -165,6 +127,11 @@ def main():
     """, unsafe_allow_html=True)
 
     # ================= SIDEBAR =================
+
+    st.sidebar.markdown("### 🧾 Income Statement Inputs")
+
+    revenue = st.sidebar.number_input("Annual Revenue", 20000000)
+    cogs = st.sidebar.number_input("Annual COGS", 14000000)
 
     st.sidebar.markdown("### 🧾 Current Assets")
 
@@ -179,7 +146,8 @@ def main():
     short_debt = st.sidebar.number_input("Short-Term Debt", 1500000)
     other_cl = st.sidebar.number_input("Other Current Liabilities", 400000)
 
-    # CALCULATIONS
+    # ================= CALCULATIONS =================
+
     total_ca = cash + receivables + inventory + other_ca
     total_cl = payables + short_debt + other_cl
 
@@ -187,29 +155,39 @@ def main():
     current_ratio = total_ca / total_cl if total_cl else 0
     quick_ratio = (cash + receivables) / total_cl if total_cl else 0
 
+    # CCC Components
+    dso = (receivables / revenue) * 365 if revenue else 0
+    dio = (inventory / cogs) * 365 if cogs else 0
+    dpo = (payables / cogs) * 365 if cogs else 0
+    ccc = dso + dio - dpo
+
     # ================= TABS =================
 
-    tab1, tab2 = st.tabs(["📊 Balance Sheet View", "📈 Working Capital Metrics"])
+    tab1, tab2, tab3 = st.tabs([
+        "📊 Balance Sheet",
+        "📈 Liquidity Metrics",
+        "🔄 Cash Conversion Cycle"
+    ])
 
+    # Balance Sheet
     with tab1:
         st.markdown('<div class="section-title">Balance Sheet Snapshot</div>', unsafe_allow_html=True)
 
         col1, col2 = st.columns(2)
 
         with col1:
-            st.markdown("#### Current Assets")
             st.dataframe(pd.DataFrame({
-                "Component": ["Cash", "Receivables", "Inventory", "Other CA", "Total CA"],
+                "Current Assets": ["Cash", "Receivables", "Inventory", "Other CA", "Total CA"],
                 "Amount": [cash, receivables, inventory, other_ca, total_ca]
             }), use_container_width=True, hide_index=True)
 
         with col2:
-            st.markdown("#### Current Liabilities")
             st.dataframe(pd.DataFrame({
-                "Component": ["Payables", "Short-Term Debt", "Other CL", "Total CL"],
+                "Current Liabilities": ["Payables", "Short-Term Debt", "Other CL", "Total CL"],
                 "Amount": [payables, short_debt, other_cl, total_cl]
             }), use_container_width=True, hide_index=True)
 
+    # Liquidity
     with tab2:
         st.markdown('<div class="section-title">Working Capital Analytics</div>', unsafe_allow_html=True)
 
@@ -224,14 +202,27 @@ def main():
         with col3:
             st.markdown(f'<div class="metric-card"><div class="label">Quick Ratio</div><div class="value">{quick_ratio:.2f}</div></div>', unsafe_allow_html=True)
 
-        st.markdown("### Liquidity Status")
+    # CCC
+    with tab3:
+        st.markdown('<div class="section-title">Cash Conversion Cycle</div>', unsafe_allow_html=True)
 
-        if current_ratio >= 1.5:
-            st.success("Strong liquidity position.")
-        elif current_ratio >= 1:
-            st.warning("Moderate liquidity. Monitor closely.")
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            st.metric("DSO (Days)", f"{dso:.1f}")
+        with col2:
+            st.metric("DIO (Days)", f"{dio:.1f}")
+        with col3:
+            st.metric("DPO (Days)", f"{dpo:.1f}")
+        with col4:
+            st.metric("CCC (Days)", f"{ccc:.1f}")
+
+        if ccc < 0:
+            st.success("Negative CCC — strong working capital efficiency.")
+        elif ccc < 60:
+            st.info("Moderate CCC — manageable cycle.")
         else:
-            st.error("Liquidity risk detected.")
+            st.warning("High CCC — working capital tied up for long duration.")
 
     st.divider()
     st.markdown(f"""
