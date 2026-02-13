@@ -1,3 +1,32 @@
+/* ===== MAIN CONTENT TEXT CONTRAST FIX ===== */
+
+/* ===== MAIN CONTENT TEXT CONTRAST FIX ===== */
+
+.main p,
+.main label,
+.main span,
+.main div,
+.main h2,
+.main h3,
+.main h4 {{
+    color: {COLORS['text_primary']} !important;
+}}
+
+/* Make number input labels strong white */
+div[data-testid="stNumberInput"] label {{
+    color: {COLORS['text_primary']} !important;
+    font-weight: 600 !important;
+}}
+
+/* Ensure section headings pop */
+h2, h3 {{
+    color: {COLORS['accent_gold']} !important;
+}}
+
+/* Improve expander headers if used */
+details summary {{
+    color: {COLORS['accent_gold']} !important;
+}}
 
 
 """
