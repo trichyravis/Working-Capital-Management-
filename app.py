@@ -132,6 +132,38 @@ def metric_card(label, value):
     </div>
     """, unsafe_allow_html=True)
 
+/* ===== FORCE MAIN CONTENT TEXT TO BE HIGH CONTRAST ===== */
+
+.main * {
+    color: #e6f1ff !important;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    color: #FFD700 !important;
+}
+
+/* Markdown text */
+div[data-testid="stMarkdownContainer"] p {
+    color: #e6f1ff !important;
+}
+
+/* Slider label text */
+div[data-testid="stSlider"] label {
+    color: #e6f1ff !important;
+}
+
+/* Alert text */
+div[data-testid="stAlert"] * {
+    color: white !important;
+}
+
+/* Success box background text clarity */
+div[data-testid="stAlert"] {
+    font-weight: 500;
+}
+
+
 # ============================================================================
 # MAIN APPLICATION
 # ============================================================================
