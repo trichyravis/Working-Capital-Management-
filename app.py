@@ -1,33 +1,3 @@
-/* ===== MAIN CONTENT TEXT CONTRAST FIX ===== */
-
-/* ===== MAIN CONTENT TEXT CONTRAST FIX ===== */
-
-.main p,
-.main label,
-.main span,
-.main div,
-.main h2,
-.main h3,
-.main h4 {{
-    color: {COLORS['text_primary']} !important;
-}}
-
-/* Make number input labels strong white */
-div[data-testid="stNumberInput"] label {{
-    color: {COLORS['text_primary']} !important;
-    font-weight: 600 !important;
-}}
-
-/* Ensure section headings pop */
-h2, h3 {{
-    color: {COLORS['accent_gold']} !important;
-}}
-
-/* Improve expander headers if used */
-details summary {{
-    color: {COLORS['accent_gold']} !important;
-}}
-
 
 """
 Working Capital AI Agent - Mountain Path Edition
@@ -91,6 +61,29 @@ def apply_styles():
     section[data-testid="stSidebar"] input {{
         background-color: white !important;
         color: black !important;
+    }}
+
+    /* ===== MAIN CONTENT CONTRAST FIX ===== */
+
+    .main p,
+    .main label,
+    .main span,
+    .main div {{
+        color: {COLORS['text_primary']} !important;
+    }}
+
+    div[data-testid="stNumberInput"] label {{
+        color: {COLORS['text_primary']} !important;
+        font-weight: 600 !important;
+    }}
+
+    h1, h2, h3 {{
+        color: {COLORS['accent_gold']} !important;
+    }}
+
+    div[data-testid="stDataFrame"] {{
+        background-color: white !important;
+        border-radius: 10px !important;
     }}
 
     .header-container {{
@@ -218,7 +211,6 @@ def main():
         "📊 Advanced CFO View"
     ])
 
-
     # -------- BALANCE SHEET --------
     with tab1:
         col1, col2 = st.columns(2)
@@ -239,30 +231,18 @@ def main():
     with tab2:
         col1, col2, col3 = st.columns(3)
 
-        with col1:
-            metric_card("Net Working Capital", f"{net_wc:,.0f}")
-
-        with col2:
-            metric_card("Current Ratio", f"{current_ratio:.2f}")
-
-        with col3:
-            metric_card("Quick Ratio", f"{quick_ratio:.2f}")
+        col1.metric("Net Working Capital", f"{net_wc:,.0f}")
+        col2.metric("Current Ratio", f"{current_ratio:.2f}")
+        col3.metric("Quick Ratio", f"{quick_ratio:.2f}")
 
     # -------- CCC --------
     with tab3:
         col1, col2, col3, col4 = st.columns(4)
 
-        with col1:
-            metric_card("DSO (Days)", f"{dso:.1f}")
-
-        with col2:
-            metric_card("DIO (Days)", f"{dio:.1f}")
-
-        with col3:
-            metric_card("DPO (Days)", f"{dpo:.1f}")
-
-        with col4:
-            metric_card("CCC (Days)", f"{ccc:.1f}")
+        col1.metric("DSO (Days)", f"{dso:.1f}")
+        col2.metric("DIO (Days)", f"{dio:.1f}")
+        col3.metric("DPO (Days)", f"{dpo:.1f}")
+        col4.metric("CCC (Days)", f"{ccc:.1f}")
 
         st.markdown("<br>", unsafe_allow_html=True)
 
@@ -285,11 +265,9 @@ def main():
 
         for year in range(1, 4):
             rev = rev * (1 + growth_rate)
-
             rec = (dso / 365) * rev
             inv = (dio / 365) * cogs * (1 + growth_rate) ** year
             pay = (dpo / 365) * cogs * (1 + growth_rate) ** year
-
             wc = rec + inv - pay
 
             forecast_data.append({
@@ -301,7 +279,6 @@ def main():
         st.dataframe(pd.DataFrame(forecast_data), use_container_width=True, hide_index=True)
 
         st.markdown("---")
-
         st.markdown("### 🏦 DSCR & Covenant Check")
 
         debt = st.number_input("Total Debt", 5000000)
@@ -312,22 +289,16 @@ def main():
         ebitda = revenue * ebitda_margin
         interest = debt * interest_rate
         debt_service = interest + principal_payment
-
         dscr = ebitda / debt_service if debt_service else 0
 
         col1, col2 = st.columns(2)
-
-        with col1:
-            metric_card("EBITDA", f"{ebitda:,.0f}")
-
-        with col2:
-            metric_card("DSCR", f"{dscr:.2f}")
+        col1.metric("EBITDA", f"{ebitda:,.0f}")
+        col2.metric("DSCR", f"{dscr:.2f}")
 
         if dscr < 1.25:
             st.warning("⚠️ DSCR Covenant Risk")
         else:
             st.success("DSCR Covenant Comfortable")
-
 
     st.divider()
     st.markdown(f"""
@@ -339,5 +310,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
