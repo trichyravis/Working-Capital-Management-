@@ -49,6 +49,7 @@ def apply_styles():
             background: linear-gradient(135deg, {COLORS['bg_dark']} 0%, {COLORS['dark_blue']} 50%, #0d2137 100%);
         }}
 
+        /* Sidebar */
         section[data-testid="stSidebar"] {{
             background: linear-gradient(180deg, {COLORS['bg_dark']} 0%, {COLORS['dark_blue']} 100%);
         }}
@@ -63,6 +64,7 @@ def apply_styles():
             color: black !important;
         }}
 
+        /* Header */
         .header-container {{
             background: linear-gradient(135deg, {COLORS['dark_blue']}, {COLORS['medium_blue']});
             border: 2px solid {COLORS['accent_gold']};
@@ -81,25 +83,49 @@ def apply_styles():
             color: {COLORS['text_primary']} !important;
         }}
 
-        .metric-card {{
+        /* TABS */
+        .stTabs [data-baseweb="tab"] {{
+            background: {COLORS['card_bg']};
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 8px;
+            color: {COLORS['text_primary']} !important;
+            font-weight: 600;
+            padding: 8px 16px;
+        }}
+
+        .stTabs [aria-selected="true"] {{
+            background: {COLORS['dark_blue']} !important;
+            border: 2px solid {COLORS['accent_gold']} !important;
+            color: {COLORS['accent_gold']} !important;
+        }}
+
+        /* ===== FIX METRIC VISIBILITY ===== */
+
+        div[data-testid="metric-container"] {{
             background: {COLORS['card_bg']};
             border: 1px solid rgba(255,215,0,0.3);
             border-radius: 10px;
-            padding: 1.2rem;
-            text-align: center;
+            padding: 1rem;
         }}
 
-        .metric-card .label {{
-            color: {COLORS['text_secondary']};
+        div[data-testid="metric-container"] label {{
+            color: {COLORS['text_secondary']} !important;
             font-size: 0.8rem;
         }}
 
-        .metric-card .value {{
-            color: {COLORS['accent_gold']};
-            font-size: 1.5rem;
-            font-weight: bold;
+        div[data-testid="metric-container"] div {{
+            color: {COLORS['accent_gold']} !important;
+            font-size: 1.6rem;
+            font-weight: 700;
         }}
 
+        /* FIX ALERT TEXT */
+        div[data-testid="stAlert"] {{
+            color: {COLORS['text_primary']} !important;
+            font-weight: 500;
+        }}
+
+        /* Section titles */
         .section-title {{
             color: {COLORS['accent_gold']};
             font-size: 1.3rem;
@@ -109,6 +135,7 @@ def apply_styles():
         footer {{visibility: hidden;}}
     </style>
     """, unsafe_allow_html=True)
+
 
 # ============================================================================
 # MAIN
