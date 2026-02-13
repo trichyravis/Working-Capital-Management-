@@ -1,18 +1,24 @@
 
 """
-Working Capital AI Agent - Mountain Path Edition
-With Solid Metric Cards (No st.metric transparency issues)
+Working Capital AI Engine - Mountain Path Edition
+CFO Decision System
 
-The Mountain Path - World of Finance
-Prof. V. Ravichandran
+Includes:
+- Traffic Light Risk Coding
+- CCC Waterfall
+- Working Capital Release Simulation
+- Scenario Analysis
+- AI Advisory Engine
+
+ZERO external chart libraries
 """
 
 import streamlit as st
 import pandas as pd
 
-# ============================================================================
+# ==========================================================
 # BRANDING
-# ============================================================================
+# ==========================================================
 
 COLORS = {
     'dark_blue': '#003366',
@@ -22,6 +28,9 @@ COLORS = {
     'card_bg': '#112240',
     'text_primary': '#e6f1ff',
     'text_secondary': '#8892b0',
+    'success': '#2ecc71',
+    'warning': '#f39c12',
+    'danger': '#e74c3c'
 }
 
 BRANDING = {
@@ -31,81 +40,44 @@ BRANDING = {
     'icon': '🏔️',
 }
 
-PAGE_CONFIG = {
-    'page_title': 'Working Capital AI Agent | Mountain Path',
-    'page_icon': '🏔️',
-    'layout': 'wide',
-    'initial_sidebar_state': 'expanded',
-}
-
-# ============================================================================
+# ==========================================================
 # STYLING
-# ============================================================================
+# ==========================================================
 
 def apply_styles():
     st.markdown(f"""
     <style>
-
     .stApp {{
         background: linear-gradient(135deg, {COLORS['bg_dark']} 0%, {COLORS['dark_blue']} 50%, #0d2137 100%);
     }}
-
     section[data-testid="stSidebar"] {{
         background: linear-gradient(180deg, {COLORS['bg_dark']} 0%, {COLORS['dark_blue']} 100%);
     }}
-
     section[data-testid="stSidebar"] * {{
         color: {COLORS['text_primary']} !important;
     }}
-
     section[data-testid="stSidebar"] input {{
-        background-color: white !important;
-        color: black !important;
+        background-color:white !important;
+        color:black !important;
     }}
-
-    .header-container {{
-        background: linear-gradient(135deg, {COLORS['dark_blue']}, {COLORS['medium_blue']});
-        border: 2px solid {COLORS['accent_gold']};
-        border-radius: 12px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        text-align: center;
-    }}
-
-    .header-container h1 {{
-        color: {COLORS['accent_gold']} !important;
-        font-size: 2.2rem;
-    }}
-
-    .header-container p {{
-        color: {COLORS['text_primary']} !important;
-    }}
-
-    .stTabs [data-baseweb="tab"] {{
-        background: {COLORS['card_bg']};
-        border: 1px solid rgba(255,215,0,0.3);
-        border-radius: 8px;
-        color: {COLORS['text_primary']} !important;
-        font-weight: 600;
-        padding: 8px 16px;
-    }}
-
-    .stTabs [aria-selected="true"] {{
-        background: {COLORS['dark_blue']} !important;
-        border: 2px solid {COLORS['accent_gold']} !important;
-        color: {COLORS['accent_gold']} !important;
-    }}
-
-    footer {{visibility: hidden;}}
-
+    footer {{visibility:hidden;}}
     </style>
     """, unsafe_allow_html=True)
 
-# ============================================================================
-# METRIC CARD FUNCTION
-# ============================================================================
+# ==========================================================
+# METRIC CARD WITH TRAFFIC LIGHT
+# ==========================================================
 
-def metric_card(label, value):
+def metric_card(label, value, status=None):
+    color = COLORS['accent_gold']
+
+    if status == "good":
+        color = COLORS['success']
+    elif status == "moderate":
+        color = COLORS['warning']
+    elif status == "bad":
+        color = COLORS['danger']
+
     st.markdown(f"""
     <div style="
         background:{COLORS['card_bg']};
@@ -114,139 +86,128 @@ def metric_card(label, value):
         border:1px solid rgba(255,215,0,0.3);
         text-align:center;
     ">
-        <div style="
-            color:{COLORS['text_secondary']};
-            font-size:0.9rem;
-            margin-bottom:10px;
-        ">
+        <div style="color:{COLORS['text_secondary']}; font-size:0.9rem;">
             {label}
         </div>
-        <div style="
-            color:{COLORS['accent_gold']};
-            font-size:2rem;
-            font-weight:700;
-        ">
+        <div style="color:{color}; font-size:2rem; font-weight:700;">
             {value}
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-# ============================================================================
-# MAIN APPLICATION
-# ============================================================================
+# ==========================================================
+# MAIN
+# ==========================================================
 
 def main():
-    st.set_page_config(**PAGE_CONFIG)
+    st.set_page_config(page_title="WC AI Engine", layout="wide")
     apply_styles()
 
-    # HEADER
     st.markdown(f"""
-    <div class="header-container">
-        <h1>{BRANDING['icon']} Working Capital AI Agent</h1>
-        <p>{BRANDING['name']}</p>
-        <p>{BRANDING['instructor']} | {BRANDING['credentials']}</p>
-    </div>
+    <h1 style="color:{COLORS['accent_gold']}">
+    {BRANDING['icon']} Working Capital AI Engine
+    </h1>
     """, unsafe_allow_html=True)
 
-    # ================= SIDEBAR =================
+    # ================= INPUTS =================
+    st.sidebar.header("Financial Inputs")
 
-    st.sidebar.markdown("### 🧾 Income Statement Inputs")
     revenue = st.sidebar.number_input("Annual Revenue", 20000000)
     cogs = st.sidebar.number_input("Annual COGS", 14000000)
-
-    st.sidebar.markdown("### 🧾 Current Assets")
-    cash = st.sidebar.number_input("Cash", 2000000)
     receivables = st.sidebar.number_input("Accounts Receivable", 5000000)
     inventory = st.sidebar.number_input("Inventory", 3000000)
-    other_ca = st.sidebar.number_input("Other Current Assets", 500000)
-
-    st.sidebar.markdown("### 💳 Current Liabilities")
     payables = st.sidebar.number_input("Accounts Payable", 3500000)
-    short_debt = st.sidebar.number_input("Short-Term Debt", 1500000)
-    other_cl = st.sidebar.number_input("Other Current Liabilities", 400000)
 
     # ================= CALCULATIONS =================
-
-    total_ca = cash + receivables + inventory + other_ca
-    total_cl = payables + short_debt + other_cl
-
-    net_wc = total_ca - total_cl
-    current_ratio = total_ca / total_cl if total_cl else 0
-    quick_ratio = (cash + receivables) / total_cl if total_cl else 0
-
     dso = (receivables / revenue) * 365 if revenue else 0
     dio = (inventory / cogs) * 365 if cogs else 0
     dpo = (payables / cogs) * 365 if cogs else 0
     ccc = dso + dio - dpo
 
-    # ================= TABS =================
+    working_capital = receivables + inventory - payables
 
-    tab1, tab2, tab3 = st.tabs([
-        "📊 Balance Sheet",
-        "📈 Liquidity Metrics",
-        "🔄 Cash Conversion Cycle"
+    # ================= TABS =================
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "📊 Traffic Dashboard",
+        "🔄 CCC Waterfall",
+        "💰 WC Release Simulation",
+        "🤖 AI Advisory"
     ])
 
-    # -------- BALANCE SHEET --------
+    # ==========================================================
+    # 1️⃣ TRAFFIC LIGHT DASHBOARD
+    # ==========================================================
     with tab1:
-        col1, col2 = st.columns(2)
-
-        with col1:
-            st.dataframe(pd.DataFrame({
-                "Current Assets": ["Cash", "Receivables", "Inventory", "Other CA", "Total CA"],
-                "Amount": [cash, receivables, inventory, other_ca, total_ca]
-            }), use_container_width=True, hide_index=True)
-
-        with col2:
-            st.dataframe(pd.DataFrame({
-                "Current Liabilities": ["Payables", "Short-Term Debt", "Other CL", "Total CL"],
-                "Amount": [payables, short_debt, other_cl, total_cl]
-            }), use_container_width=True, hide_index=True)
-
-    # -------- LIQUIDITY --------
-    with tab2:
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
-            metric_card("Net Working Capital", f"{net_wc:,.0f}")
-
-        with col2:
-            metric_card("Current Ratio", f"{current_ratio:.2f}")
-
-        with col3:
-            metric_card("Quick Ratio", f"{quick_ratio:.2f}")
-
-    # -------- CCC --------
-    with tab3:
         col1, col2, col3, col4 = st.columns(4)
 
+        dso_status = "good" if dso < 60 else "moderate" if dso < 90 else "bad"
+        dio_status = "good" if dio < 60 else "moderate" if dio < 90 else "bad"
+        dpo_status = "good" if dpo > 60 else "moderate"
+        ccc_status = "good" if ccc < 0 else "moderate" if ccc < 60 else "bad"
+
         with col1:
-            metric_card("DSO (Days)", f"{dso:.1f}")
-
+            metric_card("DSO (Days)", f"{dso:.1f}", dso_status)
         with col2:
-            metric_card("DIO (Days)", f"{dio:.1f}")
-
+            metric_card("DIO (Days)", f"{dio:.1f}", dio_status)
         with col3:
-            metric_card("DPO (Days)", f"{dpo:.1f}")
-
+            metric_card("DPO (Days)", f"{dpo:.1f}", dpo_status)
         with col4:
-            metric_card("CCC (Days)", f"{ccc:.1f}")
+            metric_card("CCC (Days)", f"{ccc:.1f}", ccc_status)
 
-        st.markdown("<br>", unsafe_allow_html=True)
+    # ==========================================================
+    # 2️⃣ CCC WATERFALL
+    # ==========================================================
+    with tab2:
+        st.subheader("CCC Decomposition")
 
-        if ccc < 0:
-            st.success("Negative CCC — strong working capital efficiency.")
-        elif ccc < 60:
-            st.info("Moderate CCC — manageable cycle.")
+        waterfall_df = pd.DataFrame({
+            "Component": ["DSO", "DIO", "-DPO"],
+            "Days": [dso, dio, -dpo]
+        }).set_index("Component")
+
+        st.bar_chart(waterfall_df)
+
+    # ==========================================================
+    # 3️⃣ WORKING CAPITAL RELEASE SIMULATION
+    # ==========================================================
+    with tab3:
+        st.subheader("Cash Release from CCC Improvement")
+
+        target_dso = st.slider("Reduce DSO by (days)", 0, 60, 10)
+        target_dio = st.slider("Reduce DIO by (days)", 0, 60, 10)
+
+        cash_release_dso = (target_dso / 365) * revenue
+        cash_release_dio = (target_dio / 365) * cogs
+
+        total_release = cash_release_dso + cash_release_dio
+
+        st.markdown(f"""
+        **Estimated Cash Release:**  
+        ₹ {total_release:,.0f}
+        """)
+
+    # ==========================================================
+    # 4️⃣ AI RECOMMENDATION ENGINE
+    # ==========================================================
+    with tab4:
+        st.subheader("AI Working Capital Recommendations")
+
+        recommendations = []
+
+        if dso > 90:
+            recommendations.append("Implement stricter credit policy.")
+        if dio > 90:
+            recommendations.append("Optimize inventory procurement cycles.")
+        if dpo < 45:
+            recommendations.append("Negotiate better supplier credit terms.")
+        if ccc > 60:
+            recommendations.append("Launch working capital optimization program.")
+
+        if not recommendations:
+            st.success("Working capital structure is efficient.")
         else:
-            st.warning("High CCC — working capital tied up for long duration.")
-
-    st.divider()
-    st.markdown(f"""
-    <div style="text-align:center; color:{COLORS['accent_gold']}; font-weight:bold;">
-        {BRANDING['icon']} {BRANDING['name']}
-    </div>
-    """, unsafe_allow_html=True)
+            for r in recommendations:
+                st.warning(r)
 
 
 if __name__ == "__main__":
