@@ -200,11 +200,14 @@ def main():
     dpo = (payables / cogs) * 365 if cogs else 0
     ccc = dso + dio - dpo
 
-    tab1, tab2, tab3 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "📊 Balance Sheet",
         "📈 Liquidity Metrics",
-        "🔄 Cash Conversion Cycle"
+        "🔄 Cash Conversion Cycle",
+        "📈 3-Year Forecast",
+        "🏦 Covenant & Stress Test"
     ])
+
 
     # BALANCE SHEET
     with tab1:
