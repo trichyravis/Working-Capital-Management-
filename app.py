@@ -248,13 +248,26 @@ def main():
         # NEW: CCC WATERFALL (non-intrusive)
         # ==========================================================
         st.markdown("### 📊 CCC Decomposition")
-
+        
+        # Create waterfall dataframe
         waterfall = pd.DataFrame({
             "Component": ["DSO", "DIO", "-DPO"],
             "Days": [dso, dio, -dpo]
         }).set_index("Component")
-
+        
+        # Wrap chart in light container for visibility
+        st.markdown("""
+        <div style="
+            background:white;
+            padding:20px;
+            border-radius:12px;
+        ">
+        """, unsafe_allow_html=True)
+        
         st.bar_chart(waterfall)
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+
 
         # ==========================================================
         # NEW: Working Capital Release Simulation
