@@ -1,25 +1,29 @@
 
 """
 Working Capital AI Agent - Mountain Path Edition
-Now with Current Assets & Current Liabilities Structure
-
 The Mountain Path - World of Finance
 Prof. V. Ravichandran
+
+Now Includes:
+- Current Assets
+- Current Liabilities
+- Net Working Capital
+- Liquidity Ratios
+- Premium Institutional UI
+
+ZERO external chart libraries - Streamlit native only
 """
 
 import streamlit as st
 import pandas as pd
-import numpy as np
-from sklearn.linear_model import LogisticRegression, LinearRegression
 
 # ============================================================================
-# BRANDING & STYLING
+# BRANDING & COLORS
 # ============================================================================
 
 COLORS = {
     'dark_blue': '#003366',
     'medium_blue': '#004d80',
-    'light_blue': '#ADD8E6',
     'accent_gold': '#FFD700',
     'bg_dark': '#0a1628',
     'card_bg': '#112240',
@@ -44,6 +48,10 @@ PAGE_CONFIG = {
 }
 
 
+# ============================================================================
+# STYLING
+# ============================================================================
+
 def apply_styles():
     st.markdown(f"""
     <style>
@@ -51,11 +59,11 @@ def apply_styles():
             background: linear-gradient(135deg, {COLORS['bg_dark']} 0%, {COLORS['dark_blue']} 50%, #0d2137 100%);
         }}
 
+        /* SIDEBAR */
         section[data-testid="stSidebar"] {{
             background: linear-gradient(180deg, {COLORS['bg_dark']} 0%, {COLORS['dark_blue']} 100%);
         }}
 
-        /* Sidebar text */
         section[data-testid="stSidebar"] label,
         section[data-testid="stSidebar"] p,
         section[data-testid="stSidebar"] span {{
@@ -67,12 +75,31 @@ def apply_styles():
             color: black !important;
         }}
 
-        /* ===== TAB FIX ===== */
-
-        .stTabs [data-baseweb="tab-list"] {{
-            gap: 8px;
+        /* HEADER */
+        .header-container {{
+            background: linear-gradient(135deg, {COLORS['dark_blue']}, {COLORS['medium_blue']});
+            border: 2px solid {COLORS['accent_gold']};
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0px 4px 20px rgba(0,0,0,0.4);
         }}
 
+        .header-container h1 {{
+            color: {COLORS['accent_gold']} !important;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }}
+
+        .header-container p {{
+            color: {COLORS['text_primary']} !important;
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }}
+
+        /* TABS */
         .stTabs [data-baseweb="tab"] {{
             background: {COLORS['card_bg']};
             border: 1px solid rgba(255,215,0,0.3);
@@ -88,40 +115,47 @@ def apply_styles():
             color: {COLORS['accent_gold']} !important;
         }}
 
-        /* Header */
-        .header-container {{
-    background: linear-gradient(135deg, {COLORS['dark_blue']}, {COLORS['medium_blue']});
-    border: 2px solid {COLORS['accent_gold']};
-    border-radius: 12px;
-    padding: 1.8rem;
-    margin-bottom: 1.5rem;
-    text-align: center;
-}}
+        /* METRIC CARDS */
+        .metric-card {{
+            background: {COLORS['card_bg']};
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 10px;
+            padding: 1.2rem;
+            text-align: center;
+        }}
 
-.header-container h1 {{
-    color: {COLORS['accent_gold']} !important;
-    font-size: 2.2rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-}}
+        .metric-card .label {{
+            color: {COLORS['text_secondary']};
+            font-size: 0.8rem;
+        }}
 
-.header-container p {{
-    color: {COLORS['text_primary']} !important;
-    font-size: 0.95rem;
-    opacity: 0.9;
-}}
+        .metric-card .value {{
+            color: {COLORS['accent_gold']};
+            font-size: 1.6rem;
+            font-weight: bold;
+        }}
 
+        .section-title {{
+            color: {COLORS['accent_gold']};
+            font-size: 1.3rem;
+            border-bottom: 2px solid rgba(255,215,0,0.3);
+            margin: 1.5rem 0 1rem;
+        }}
 
+        footer {{visibility: hidden;}}
+    </style>
+    """, unsafe_allow_html=True)
 
 
 # ============================================================================
-# MAIN
+# MAIN APPLICATION
 # ============================================================================
 
 def main():
     st.set_page_config(**PAGE_CONFIG)
     apply_styles()
 
+    # HEADER
     st.markdown(f"""
     <div class="header-container">
         <h1>{BRANDING['icon']} Working Capital AI Agent</h1>
@@ -145,14 +179,13 @@ def main():
     short_debt = st.sidebar.number_input("Short-Term Debt", 1500000)
     other_cl = st.sidebar.number_input("Other Current Liabilities", 400000)
 
-    # ================= CALCULATIONS =================
-
+    # CALCULATIONS
     total_ca = cash + receivables + inventory + other_ca
     total_cl = payables + short_debt + other_cl
 
-    net_working_capital = total_ca - total_cl
-    current_ratio = total_ca / total_cl if total_cl != 0 else 0
-    quick_ratio = (cash + receivables) / total_cl if total_cl != 0 else 0
+    net_wc = total_ca - total_cl
+    current_ratio = total_ca / total_cl if total_cl else 0
+    quick_ratio = (cash + receivables) / total_cl if total_cl else 0
 
     # ================= TABS =================
 
@@ -183,7 +216,7 @@ def main():
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            st.markdown(f'<div class="metric-card"><div class="label">Net Working Capital</div><div class="value">{net_working_capital:,.0f}</div></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-card"><div class="label">Net Working Capital</div><div class="value">{net_wc:,.0f}</div></div>', unsafe_allow_html=True)
 
         with col2:
             st.markdown(f'<div class="metric-card"><div class="label">Current Ratio</div><div class="value">{current_ratio:.2f}</div></div>', unsafe_allow_html=True)
@@ -199,7 +232,6 @@ def main():
             st.warning("Moderate liquidity. Monitor closely.")
         else:
             st.error("Liquidity risk detected.")
-
 
     st.divider()
     st.markdown(f"""
