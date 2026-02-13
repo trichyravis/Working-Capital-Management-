@@ -182,11 +182,13 @@ def main():
 
     # ================= TABS =================
 
-    tab1, tab2, tab3 = st.tabs([
+    tab1, tab2, tab3, tab4 = st.tabs([
         "📊 Balance Sheet",
         "📈 Liquidity Metrics",
-        "🔄 Cash Conversion Cycle"
+        "🔄 Cash Conversion Cycle",
+        "📊 Advanced CFO View"
     ])
+
 
     # -------- BALANCE SHEET --------
     with tab1:
@@ -241,6 +243,62 @@ def main():
             st.info("Moderate CCC — manageable cycle.")
         else:
             st.warning("High CCC — working capital tied up for long duration.")
+
+    # -------- ADVANCED CFO VIEW --------
+    with tab4:
+
+        st.markdown("### 📈 3-Year Working Capital Forecast")
+
+        growth_rate = st.slider("Revenue Growth (%)", 0, 30, 10) / 100
+
+        forecast_data = []
+        rev = revenue
+
+        for year in range(1, 4):
+            rev = rev * (1 + growth_rate)
+
+            rec = (dso / 365) * rev
+            inv = (dio / 365) * cogs * (1 + growth_rate) ** year
+            pay = (dpo / 365) * cogs * (1 + growth_rate) ** year
+
+            wc = rec + inv - pay
+
+            forecast_data.append({
+                "Year": f"Year {year}",
+                "Revenue": round(rev),
+                "Working Capital Required": round(wc)
+            })
+
+        st.dataframe(pd.DataFrame(forecast_data), use_container_width=True, hide_index=True)
+
+        st.markdown("---")
+
+        st.markdown("### 🏦 DSCR & Covenant Check")
+
+        debt = st.number_input("Total Debt", 5000000)
+        interest_rate = st.number_input("Interest Rate (%)", 10) / 100
+        principal_payment = st.number_input("Annual Principal Payment", 1000000)
+        ebitda_margin = st.number_input("EBITDA Margin (%)", 25) / 100
+
+        ebitda = revenue * ebitda_margin
+        interest = debt * interest_rate
+        debt_service = interest + principal_payment
+
+        dscr = ebitda / debt_service if debt_service else 0
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            metric_card("EBITDA", f"{ebitda:,.0f}")
+
+        with col2:
+            metric_card("DSCR", f"{dscr:.2f}")
+
+        if dscr < 1.25:
+            st.warning("⚠️ DSCR Covenant Risk")
+        else:
+            st.success("DSCR Covenant Comfortable")
+
 
     st.divider()
     st.markdown(f"""
