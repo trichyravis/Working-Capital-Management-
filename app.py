@@ -63,24 +63,22 @@ def apply_styles():
         color: black !important;
     }}
 
-    /* ===== MAIN CONTENT CONTRAST FIX ===== */
-
-    .main p,
-    .main label,
-    .main span,
-    .main div {{
-        color: {COLORS['text_primary']} !important;
-    }}
-
-    div[data-testid="stNumberInput"] label {{
-        color: {COLORS['text_primary']} !important;
-        font-weight: 600 !important;
-    }}
+    /* ===== FIX MAIN TEXT VISIBILITY (SAFE TARGETING) ===== */
 
     h1, h2, h3 {{
         color: {COLORS['accent_gold']} !important;
     }}
 
+    label {{
+        color: {COLORS['text_primary']} !important;
+        font-weight: 600 !important;
+    }}
+
+    p {{
+        color: {COLORS['text_primary']} !important;
+    }}
+
+    /* Improve DataFrame readability */
     div[data-testid="stDataFrame"] {{
         background-color: white !important;
         border-radius: 10px !important;
@@ -123,6 +121,7 @@ def apply_styles():
 
     </style>
     """, unsafe_allow_html=True)
+
 
 # ============================================================================
 # METRIC CARD FUNCTION
